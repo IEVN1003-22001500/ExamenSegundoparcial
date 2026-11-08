@@ -1,0 +1,109 @@
+<div class="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg mt-6">
+  <h2 class="text-2xl font-bold mb-4 text-gray-800">Módulo de Consulta de Ventas</h2>
+
+  <!-- Sección de Filtros -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <!-- Consultar por Día -->
+    <div class="p-4 border rounded-md bg-gray-50">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Consultar por Día (ej. lunes)</label>
+      <div class="flex gap-2">
+        <input 
+          type="text" 
+          [(ngModel)]="filtroDia" 
+          class="border px-3 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ej. lunes, martes..."
+        />
+        <button 
+          (click)="consultarVentasPorDia()" 
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+        >
+          Buscar Día
+        </button>
+      </div>
+    </div>
+
+    <!-- Consultar por Mes -->
+    <div class="p-4 border rounded-md bg-gray-50">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Consultar por Mes (ej. enero)</label>
+      <div class="flex gap-2">
+        <input 
+          type="text" 
+          [(ngModel)]="filtroMes" 
+          class="border px-3 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ej. enero, febrero..."
+        />
+        <button 
+          (click)="consultarVentasPorMes()" 
+          class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
+        >
+          Buscar Mes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Resultados -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200">
+      <thead>
+        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+          <th class="py-3 px-6 text-left">ID Pedido</th>
+          <th class="py-3 px-6 text-left">Cliente</th>
+          <th class="py-3 px-6 text-left">Fecha</th>
+          <th class="py-3 px-6 text-right">Total</th>
+          <th class="py-3 px-6 text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-600 text-sm font-light">
+        <tr *ngFor="let venta of ventas" class="border-b border-gray-200 hover:bg-gray-50">
+          <td class="py-3 px-6 text-left whitespace-nowrap font-medium">#{{ venta.id }}</td>
+          <td class="py-3 px-6 text-left">{{ venta.nombre }}</td>
+          <td class="py-3 px-6 text-left">{{ venta.fecha }}</td>
+          <td class="py-3 px-6 text-right font-bold text-gray-700">${{ venta.total | number:'1.2-2' }}</td>
+          <td class="py-3 px-6 text-center">
+            <button 
+              (click)="verDetalle(venta.id)" 
+              class="bg-indigo-500 text-white px-3 py-1 rounded text-xs hover:bg-indigo-600 transition"
+            >
+              Ver Detalle
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="ventas.length === 0">
+          <td colspan="5" class="py-4 text-center text-gray-400">No se encontraron ventas para este filtro.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Total Acumulado -->
+  <div class="mt-4 text-right text-lg font-bold text-gray-800">
+    Total Acumulado: <span class="text-blue-600">${{ totalAcumulado | number:'1.2-2' }}</span>
+  </div>
+
+  <!-- Modal de Detalle -->
+  <div *ngIf="mostrarModalDetalle" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-lg shadow-xl">
+      <h3 class="text-xl font-bold mb-4 text-gray-800">Detalle de las Pizzas del Pedido</h3>
+      
+      <ul class="divide-y divide-gray-200 mb-4 max-h-60 overflow-y-auto">
+        <li *ngFor="let item of detalleSeleccionado" class="py-2 flex justify-between">
+          <div>
+            <p class="font-semibold text-gray-700">Tamaño: {{ item.tamano }} (x{{ item.num_pizzas }})</p>
+            <p class="text-xs text-gray-500">Ingredientes: {{ item.ingredientes }}</p>
+          </div>
+          <span class="font-bold text-gray-700">${{ item.subtotal | number:'1.2-2' }}</span>
+        </li>
+      </ul>
+
+      <div class="text-right">
+        <button 
+          (click)="cerrarModal()" 
+          class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+<div class="min-h-screen bg-gray-100 p-6">
+  <div class="max-w-7xl mx-auto space-y-6">
+    
+    <!-- Título Principal -->
+    <header class="bg-white shadow rounded-lg p-4 text-center">
+      <h1 class="text-3xl font-bold text-red-600">Sistema de Pizzería </h1>
+    </header>
+
+    <!-- Contenedor Principal (Grid) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Sección 1: Captura de Pedido -->
+      <div class="bg-white shadow rounded-lg p-4">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Nuevo Pedido</h2>
+        <app-captura-pedido></app-captura-pedido>
+      </div>
+
+      <!-- Sección 2: Detalle del Pedido Actual -->
+      <div class="bg-white shadow rounded-lg p-4">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Resumen y Cierre</h2>
+        <!-- Si tu detalle-pedido requiere el formulario del cliente como input -->
+        <app-detalle-pedido [formClienteParent]="capturaComponent?.formCliente"></app-detalle-pedido>
+      </div>
+
+    </div>
+
+    <!-- Sección 3: Consulta de Ventas (Abajo) -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Módulo de Ventas</h2>
+      <app-consulta-ventas></app-consulta-ventas>
+    </div>
+
+  </div>
+</div>

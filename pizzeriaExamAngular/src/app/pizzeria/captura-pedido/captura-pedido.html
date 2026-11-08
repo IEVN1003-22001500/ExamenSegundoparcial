@@ -1,0 +1,104 @@
+<!-- Formularios existentes -->
+<div class="border-4 border-red-500 rounded-lg p-4 bg-slate-200 shadow-md mb-6">
+  <form [formGroup]="formCliente" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <div>
+      <label class="block text-sm font-bold text-gray-800">Nombre</label>
+      <input type="text" formControlName="nombre" class="w-full p-2 border border-gray-400 rounded text-gray-900 bg-white dark:text-gray-900" placeholder="Ej. Mario Juárez">
+    </div>
+    <div>
+      <label class="block text-sm font-bold text-gray-800">Dirección</label>
+      <input type="text" formControlName="direccion" class="w-full p-2 border border-gray-400 rounded text-gray-900 bg-white dark:text-gray-900" placeholder="Ej. 5 de mayo">
+    </div>
+    <div>
+      <label class="block text-sm font-bold text-gray-800">Teléfono</label>
+      <input type="text" formControlName="telefono" class="w-full p-2 border border-gray-400 rounded text-gray-900 bg-white dark:text-gray-900" placeholder="Ej. 477-787-23">
+    </div>
+  </form>
+
+  <form [formGroup]="formPizza" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+    <div class="border border-gray-400 p-3 rounded bg-white">
+      <span class="block font-bold text-sm text-gray-800 mb-2">Tamaño Pizza</span>
+      <div *ngFor="let t of tamanosDisponibles" class="flex items-center mb-1">
+        <input type="radio" [id]="t.valor" [value]="t.valor" formControlName="tamano" class="mr-2">
+        <label [for]="t.valor" class="text-sm text-gray-800 font-medium">{{ t.label }}</label>
+      </div>
+    </div>
+
+    <div class="border border-gray-400 p-3 rounded bg-white">
+      <span class="block font-bold text-sm text-gray-800 mb-2">Ingredientes</span>
+      <div class="flex items-center mb-1">
+        <input type="checkbox" id="jamon" formControlName="jamon" class="mr-2">
+        <label for="jamon" class="text-sm text-gray-800 font-medium">Jamón $10</label>
+      </div>
+      <div class="flex items-center mb-1">
+        <input type="checkbox" id="pina" formControlName="pina" class="mr-2">
+        <label for="pina" class="text-sm text-gray-800 font-medium">Piña $10</label>
+      </div>
+      <div class="flex items-center mb-1">
+        <input type="checkbox" id="champinones" formControlName="champinones" class="mr-2">
+        <label for="champinones" class="text-sm text-gray-800 font-medium">Champiñones $10</label>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3 justify-center">
+      <div>
+        <label class="block text-sm font-bold text-gray-800">Núm. de Pizzas</label>
+        <input type="number" formControlName="numPizzas" min="1" class="w-full p-2 border border-gray-400 rounded text-gray-900 bg-white dark:text-gray-900">
+      </div>
+      <button type="button" (click)="agregarPizza()" class="w-full bg-gray-100 hover:bg-white text-gray-900 border border-gray-500 font-bold py-2 rounded shadow">
+        Agregar
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- SECCIÓN NUEVA: Tabla Resumen de Pizzas Agregadas -->
+<div class="bg-white border border-gray-300 rounded-lg p-4 shadow-md">
+  <h3 class="text-lg font-bold text-gray-800 mb-3">Detalle del Pedido</h3>
+  
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-100 border-b border-gray-300 text-gray-700 text-sm">
+          <th class="p-2">Tamaño</th>
+          <th class="p-2">Ingredientes</th>
+          <th class="p-2">Núm. Pizzas</th>
+          <th class="p-2">Subtotal</th>
+          <th class="p-2 text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Iteramos sobre el BehaviorSubject del servicio -->
+        <tr *ngFor="let item of pizzeriaService.detalles$ | async; let i = index" class="border-b border-gray-200 text-sm">
+          <td class="p-2 text-gray-800 font-medium">{{ item.tamano }}</td>
+          <td class="p-2 text-gray-600">
+            <span *ngIf="item.ingredientes.length > 0">{{ item.ingredientes.join(', ') }}</span>
+            <span *ngIf="item.ingredientes.length === 0" class="italic text-gray-400">Sin ingredientes extra</span>
+          </td>
+          <td class="p-2 text-gray-800">{{ item.numPizzas }}</td>
+          <td class="p-2 text-gray-800 font-bold">${{ item.subtotal | number:'1.2-2' }}</td>
+          <td class="p-2 text-center">
+            <button type="button" (click)="pizzeriaService.quitarPizza(i)" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-bold shadow">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        <!-- Si está vacío -->
+        <tr *ngIf="(pizzeriaService.detalles$ | async)?.length === 0">
+          <td colspan="5" class="p-4 text-center text-gray-500 italic">No has agregado ninguna pizza todavía.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Total y Botón de Guardado -->
+  <div class="mt-4 flex flex-col md:flex-row justify-between items-center bg-gray-50 p-4 rounded border border-gray-200 gap-4">
+    <div class="text-xl font-bold text-gray-800">
+      Total General: <span class="text-red-600">${{ pizzeriaService.calcularTotalPedido() | number:'1.2-2' }}</span>
+    </div>
+    
+    <button type="button" (click)="guardarPedidoFinal()" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded shadow transition-colors">
+      Registrar Pedido en BD
+    </button>
+  </div>
+</div>
